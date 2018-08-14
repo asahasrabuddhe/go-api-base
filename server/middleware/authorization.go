@@ -11,6 +11,7 @@ import (
 
 func AuthorizationMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
 		if r.Header.Get("Authorization") == "" {
 			w.WriteHeader(http.StatusUnauthorized)
 			fmt.Fprintln(w, "{'status': 'failure', 'error': 'Please send auth token with the request'}")
