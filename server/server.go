@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	db "gitlab.com/asahasrabuddhe/go-api-base/database"
 	"gitlab.com/asahasrabuddhe/go-api-base/router"
@@ -18,6 +19,11 @@ func Init(username, password, database, host, port string) {
 }
 
 func Start(address string, port string) error {
-	err := http.ListenAndServe(fmt.Sprintf("%v:%v", address, port), router.Router)
+	allowedHeaders := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type"})
+	allowedOrigins := handlers.AllowedOrigins([]string{"*"})
+	allowedMethods := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"})
+	// start server listen
+	// with error handling
+	err := http.ListenAndServe(fmt.Sprintf("%v:%v", address, port), handlers.CORS(allowedHeaders, allowedOrigins, allowedMethods)(router.Router))
 	return err
 }
