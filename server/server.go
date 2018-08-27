@@ -19,10 +19,12 @@ func Init(username, password, database, host, port string) {
 }
 
 func Start(address string, port string) error {
-	allowedHeaders := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type"})
+	allowedHeaders := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
 	allowedOrigins := handlers.AllowedOrigins([]string{"*"})
 	allowedMethods := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"})
 	// start server listen
+	router.Router.PathPrefix("/images/").
+		Handler(http.StripPrefix("/images/", http.FileServer(http.Dir("/home/ajitem/Projects/safebaby/bin/public/images"))))
 	// with error handling
 	err := http.ListenAndServe(fmt.Sprintf("%v:%v", address, port), handlers.CORS(allowedHeaders, allowedOrigins, allowedMethods)(router.Router))
 	return err
