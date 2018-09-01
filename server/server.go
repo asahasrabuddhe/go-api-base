@@ -35,8 +35,8 @@ func Start() error {
 	allowedOrigins := handlers.AllowedOrigins(viper.GetStringSlice("app.cors.allowed_origins"))
 	allowedMethods := handlers.AllowedMethods(viper.GetStringSlice("app.cors.allowed_methods"))
 	// start server listen
-	router.Router.PathPrefix("/images/").
-		Handler(http.StripPrefix("/images/", http.FileServer(http.Dir(viper.GetString("public_path")))))
+	router.Router.PathPrefix("/public/").
+		Handler(http.StripPrefix("/public/", http.FileServer(http.Dir(viper.GetString("public_path")))))
 	// with error handling
 	err := http.ListenAndServe(fmt.Sprintf("%v:%v", viper.GetString("app.address"), viper.GetString("app.port")), handlers.CORS(allowedHeaders, allowedOrigins, allowedMethods)(router.Router))
 	return err
