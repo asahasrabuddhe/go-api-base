@@ -29,7 +29,7 @@ func (iv *ImageValidator) Validate() error {
 			return errors.New("Invalid image data. Please try again.")
 		} else {
 			iv.ImageData = strconv.Itoa(int(time.Now().Unix())) + "_" + iv.Name + ".png"
-			if file, err := os.OpenFile(viper.GetString("app.public_path")+"/images/"+iv.Name, os.O_CREATE|os.O_WRONLY, 0644); err != nil {
+			if file, err := os.OpenFile(viper.GetString("public_path")+"/images/"+iv.ImageData, os.O_CREATE|os.O_WRONLY, 0644); err != nil {
 				return err
 			} else {
 				png.Encode(file, pngImage)
@@ -41,7 +41,7 @@ func (iv *ImageValidator) Validate() error {
 		} else {
 			strconv.Itoa(int(time.Now().Unix()))
 			iv.ImageData = strconv.Itoa(int(time.Now().Unix())) + "_" + iv.Name + ".jpg"
-			if file, err := os.OpenFile(viper.GetString("app.public_path")+"/images/"+iv.ImageData, os.O_CREATE|os.O_WRONLY, 0644); err != nil {
+			if file, err := os.OpenFile(viper.GetString("public_path")+"/images/"+iv.ImageData, os.O_CREATE|os.O_WRONLY, 0644); err != nil {
 				return err
 			} else {
 				jpeg.Encode(file, jpegImage, &jpeg.Options{Quality: 75})
@@ -52,7 +52,7 @@ func (iv *ImageValidator) Validate() error {
 			return errors.New("Invalid image data. Please try again.")
 		} else {
 			iv.ImageData = strconv.Itoa(int(time.Now().Unix())) + "_" + iv.Name + ".gif"
-			if file, err := os.OpenFile(viper.GetString("app.public_path")+"/images/"+iv.ImageData, os.O_CREATE|os.O_WRONLY, 0644); err != nil {
+			if file, err := os.OpenFile(viper.GetString("public_path")+"/images/"+iv.ImageData, os.O_CREATE|os.O_WRONLY, 0644); err != nil {
 				return err
 			} else {
 				gif.Encode(file, gifImage, &gif.Options{})
