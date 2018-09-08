@@ -44,7 +44,7 @@ func AuthorizationMiddleware(next http.Handler) http.Handler {
 
 				if claims, ok := jwtToken.Claims.(jwt.MapClaims); ok && jwtToken.Valid {
 					context.Set(r, "id", claims["aud"])
-					context.Set(r, "role", claims["role"])
+					context.Set(r, "role", claims["rle"])
 				} else {
 					fmt.Println(err)
 				}
