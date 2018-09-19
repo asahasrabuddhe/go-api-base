@@ -1,45 +1,47 @@
 package mail
 
 import (
-	"fmt"
-	"strings"
+	"github.com/asahasrabuddhe/pigeon"
+	"github.com/asahasrabuddhe/pigeon/email"
+	"github.com/asahasrabuddhe/pigeon/smtp"
+	"github.com/asahasrabuddhe/pigeon/themes/flat"
+	"github.com/spf13/viper"
 )
 
-type Mail struct {
-	FromId  string
-	ToIds   []string
-	CcIds   []string
-	BccIds  []string
-	Subject string
-	Body    string
+var p pigeon.Pigeon
+var d *smtp.Dialer
+
+type Mail interface {
+	Name() string
+	Email() email.Email
 }
 
-type SmtpServer struct {
-	Host string
-	Port string
+func BootstrapMail() {
+	p = pigeon.Pigeon{
+		Product: pigeon.Product{
+			Name: viper.GetString("app.name"),
+			Link: viper.GetString("app.url"),
+			Logo: viper.GetString("app.url") + ":" + viper.GetString("app.port") + "/public/images/logo.png",
+		},
+	}
+
+	p.Theme = new(flat.Flat)
+
+	d = smtp.NewDialer(viper.GetString("app.mail.smtp"), viper.GetInt("app.mail.port"), viper.GetString("app.mail.user"), viper.GetString("app.mail.password"))
 }
 
-func (s *SmtpServer) ServerName() string {
-	return s.Host + ":" + s.Port
+func SetTheme(theme pigeon.Theme) {
+	p.Theme = theme
 }
 
-func (mail *Mail) BuildMessage() (message string) {
-	message += fmt.Sprintf("From: %s\r\n", mail.FromId)
+func GenerateMail(mail Mail) (string, error) {
+	return p.GenerateHTML(mail.Email())
+}
 
-	if len(mail.ToIds) > 0 {
-		message += fmt.Sprintf("To: %s\r\n", strings.Join(mail.ToIds, ";"))
+func SendMail(message *smtp.Message) (bool, error) {
+	if err := d.DialAndSend(message); err != nil {
+		return false, err
+	} else {
+		return true, nil
 	}
-
-	if len(mail.CcIds) > 0 {
-		message += fmt.Sprintf("Cc: %s\r\n", strings.Join(mail.CcIds, ";"))
-	}
-
-	if len(mail.BccIds) > 0 {
-		message += fmt.Sprintf("Bcc: %s\r\n", strings.Join(mail.BccIds, ";"))
-	}
-
-	message += fmt.Sprintf("Subject: %s\r\n", mail.Subject)
-	message += "\r\n" + mail.Body
-
-	return
 }
