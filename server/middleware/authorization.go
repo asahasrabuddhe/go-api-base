@@ -3,6 +3,7 @@ package middleware
 import (
 	"fmt"
 	"github.com/gorilla/context"
+	"gitlab.com/asahasrabuddhe/go-api-base/database"
 	"gopkg.in/dgrijalva/jwt-go.v3"
 	"log"
 	"net/http"
@@ -14,17 +15,17 @@ func AuthorizationMiddleware(next http.Handler) http.Handler {
 		w.Header().Set("Content-Type", "application/json")
 		if r.Header.Get("Authorization") == "" {
 			w.WriteHeader(http.StatusUnauthorized)
-			fmt.Fprintln(w, "{'status': 'failure', 'error': 'Please send auth token with the request'}")
+			fmt.Fprintln(w, "{'status': false, 'message': 'Please send auth token with the request'}")
 			return
 		} else {
 			auth := r.Header.Get("Authorization")
 			token := strings.Split(auth, " ")
 			if len(token) != 2 {
 				w.WriteHeader(http.StatusUnauthorized)
-				fmt.Fprintln(w, "{'status': 'failure', 'error': 'Please send auth token with the request'}")
+				fmt.Fprintln(w, "{'status': false, 'message': 'Please send auth token with the request'}")
 			} else if len(token) == 2 && token[0] != "Bearer" {
 				w.WriteHeader(http.StatusUnauthorized)
-				fmt.Fprintln(w, "{'status': 'failure', 'error': 'Please send auth token with the request'}")
+				fmt.Fprintln(w, "{'status': false, 'message': 'Please send auth token with the request'}")
 			} else {
 				jwtToken, err := jwt.Parse(token[1], func(token *jwt.Token) (interface{}, error) {
 					if _, ok := token.Method.(*jwt.SigningMethodHMAC); ok {
@@ -38,13 +39,23 @@ func AuthorizationMiddleware(next http.Handler) http.Handler {
 				if err != nil {
 					w.WriteHeader(http.StatusUnauthorized)
 					log.Println(err)
-					fmt.Fprintln(w, "{'status': 'failure', 'error': 'Please send auth token with the request'}")
+					fmt.Fprintln(w, "{'status': false, 'message': 'Please send auth token with the request'}")
 					return
 				}
 
 				if claims, ok := jwtToken.Claims.(jwt.MapClaims); ok && jwtToken.Valid {
-					context.Set(r, "id", claims["aud"])
-					context.Set(r, "role", claims["rle"])
+					var user_id int
+
+					row := database.DB.QueryRow("SELECT user_id FROM user_auth_token WHERE token = ? AND deleted_on = NULL", claims["jti"])
+
+					if err := row.Scan(&user_id); err != nil {
+						fmt.Fprintln(w, "{'status': false, 'message': 'Token Expired'}")
+					} else if user_id != claims["aud"] {
+						fmt.Fprintln(w, "{'status': false, 'message': 'Invalid Token'}")
+					} else {
+						context.Set(r, "id", claims["aud"])
+						context.Set(r, "role", claims["rle"])
+					}
 				} else {
 					fmt.Println(err)
 				}
