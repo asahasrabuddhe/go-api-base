@@ -4,7 +4,7 @@ import (
 	"github.com/asahasrabuddhe/pigeon"
 	"github.com/asahasrabuddhe/pigeon/email"
 	"github.com/asahasrabuddhe/pigeon/smtp"
-	"github.com/asahasrabuddhe/pigeon/themes/flat"
+	"github.com/asahasrabuddhe/pigeon/themes"
 	"github.com/spf13/viper"
 )
 
@@ -25,7 +25,7 @@ func BootstrapMail() {
 		},
 	}
 
-	p.Theme = new(flat.Flat)
+	p.Theme = new(themes.Flat)
 
 	d = smtp.NewDialer(viper.GetString("app.mail.smtp"), viper.GetInt("app.mail.port"), viper.GetString("app.mail.user"), viper.GetString("app.mail.password"))
 }

@@ -46,12 +46,14 @@ func AuthorizationMiddleware(next http.Handler) http.Handler {
 				if claims, ok := jwtToken.Claims.(jwt.MapClaims); ok && jwtToken.Valid {
 					var user_id int
 
-					row := database.DB.QueryRow("SELECT user_id FROM user_auth_token WHERE token = ? AND deleted_on = NULL", claims["jti"])
+					row := database.DB.QueryRow("SELECT user_id FROM user_auth_tokens WHERE token = ? AND deleted_on IS NULL", claims["jti"])
 
 					if err := row.Scan(&user_id); err != nil {
 						fmt.Fprintln(w, "{'status': false, 'message': 'Token Expired'}")
-					} else if user_id != claims["aud"] {
+						return
+					} else if float64(user_id) != claims["aud"].(float64) {
 						fmt.Fprintln(w, "{'status': false, 'message': 'Invalid Token'}")
+						return
 					} else {
 						context.Set(r, "id", claims["aud"])
 						context.Set(r, "role", claims["rle"])
