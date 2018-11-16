@@ -33,7 +33,7 @@ func Init(path, filename string) {
 	db.Open(credentials["username"], credentials["password"], credentials["name"], credentials["host"], credentials["port"])
 }
 
-func Start() error {
+func Start() (err error) {
 	allowedHeaders := handlers.AllowedHeaders(viper.GetStringSlice("app.cors.allowed_headers"))
 	allowedOrigins := handlers.AllowedOrigins(viper.GetStringSlice("app.cors.allowed_origins"))
 	allowedMethods := handlers.AllowedMethods(viper.GetStringSlice("app.cors.allowed_methods"))
@@ -41,6 +41,10 @@ func Start() error {
 	router.Router.PathPrefix("/public/").
 		Handler(http.StripPrefix("/public/", http.FileServer(http.Dir(viper.GetString("public_path")))))
 	// with error handling
-	err := http.ListenAndServe(fmt.Sprintf("%v:%v", viper.GetString("app.address"), viper.GetString("app.port")), handlers.CORS(allowedHeaders, allowedOrigins, allowedMethods)(router.Router))
-	return err
+	if viper.GetBool("app.tls") {
+		err = http.ListenAndServeTLS(fmt.Sprintf("%v:%v", viper.GetString("app.address"), viper.GetString("app.port")), viper.GetString("app.cert_path"), viper.GetString("app.key_path"), handlers.CORS(allowedHeaders, allowedOrigins, allowedMethods)(router.Router))
+	} else {
+		err = http.ListenAndServe(fmt.Sprintf("%v:%v", viper.GetString("app.address"), viper.GetString("app.port")), handlers.CORS(allowedHeaders, allowedOrigins, allowedMethods)(router.Router))
+	}
+	return
 }

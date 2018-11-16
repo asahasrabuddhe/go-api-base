@@ -60,6 +60,7 @@ func AuthorizationMiddleware(next http.Handler) http.Handler {
 					}
 				} else {
 					fmt.Println(err)
+					return
 				}
 			}
 		}
