@@ -2,13 +2,13 @@ package server
 
 import (
 	"fmt"
+	db "github.com/asahasrabuddhe/go-api-base/database"
+	"github.com/asahasrabuddhe/go-api-base/mail"
+	"github.com/asahasrabuddhe/go-api-base/middleware"
+	"github.com/asahasrabuddhe/go-api-base/router"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/spf13/viper"
-	db "gitlab.com/asahasrabuddhe/go-api-base/database"
-	"gitlab.com/asahasrabuddhe/go-api-base/mail"
-	"gitlab.com/asahasrabuddhe/go-api-base/router"
-	"gitlab.com/asahasrabuddhe/go-api-base/server/middleware"
 	"log"
 	"net/http"
 )

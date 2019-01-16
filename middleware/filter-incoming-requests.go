@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"encoding/json"
-	"gitlab.com/asahasrabuddhe/go-api-base/response"
+	"github.com/asahasrabuddhe/go-api-base/response"
 	"net/http"
 )
 

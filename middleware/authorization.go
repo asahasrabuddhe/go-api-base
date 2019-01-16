@@ -3,7 +3,7 @@ package middleware
 import (
 	"fmt"
 	"github.com/gorilla/context"
-	"gitlab.com/asahasrabuddhe/go-api-base/database"
+	"github.com/asahasrabuddhe/go-api-base/database"
 	"gopkg.in/dgrijalva/jwt-go.v3"
 	"log"
 	"net/http"
