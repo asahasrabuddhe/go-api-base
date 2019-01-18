@@ -41,10 +41,11 @@ func Start() (err error) {
 	router.Router.PathPrefix("/public/").
 		Handler(http.StripPrefix("/public/", http.FileServer(http.Dir(viper.GetString("public_path")))))
 	// with error handling
+	log.Printf("Server Started On IP - %v PORT - %v", viper.GetString("app.address"), viper.GetString("app.port"))
 	if viper.GetBool("app.tls") {
-		err = http.ListenAndServeTLS(fmt.Sprintf("%v:%v", viper.GetString("app.address"), viper.GetString("app.port")), viper.GetString("app.cert_path"), viper.GetString("app.key_path"), handlers.CORS(allowedHeaders, allowedOrigins, allowedMethods)(router.Router))
+		log.Println(http.ListenAndServeTLS(fmt.Sprintf("%v:%v", viper.GetString("app.address"), viper.GetString("app.port")), viper.GetString("app.cert_path"), viper.GetString("app.key_path"), handlers.CORS(allowedHeaders, allowedOrigins, allowedMethods)(router.Router)))
 	} else {
-		err = http.ListenAndServe(fmt.Sprintf("%v:%v", viper.GetString("app.address"), viper.GetString("app.port")), handlers.CORS(allowedHeaders, allowedOrigins, allowedMethods)(router.Router))
+		log.Println(http.ListenAndServe(fmt.Sprintf("%v:%v", viper.GetString("app.address"), viper.GetString("app.port")), handlers.CORS(allowedHeaders, allowedOrigins, allowedMethods)(router.Router)))
 	}
 	return
 }
